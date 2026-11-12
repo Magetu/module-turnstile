@@ -1,0 +1,185 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Magetu. All rights reserved.
+ * See LICENSE.md for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="Magento\ReCaptchaFrontendUi\Model\CaptchaTypeResolver">
+        <plugin name="magetu_turnstile_normalize_empty_captcha_type"
+                type="Magetu\Turnstile\Plugin\NormalizeEmptyCaptchaType"/>
+    </type>
+    <type name="Magento\ReCaptchaAdminUi\Model\CaptchaTypeResolver">
+        <plugin name="magetu_turnstile_normalize_empty_captcha_type"
+                type="Magetu\Turnstile\Plugin\NormalizeEmptyCaptchaType"/>
+    </type>
+    <type name="Magento\Config\Model\Config\TypePool">
+        <arguments>
+            <argument name="sensitive" xsi:type="array">
+                <item name="recaptcha_backend/type_magetu_turnstile/public_key" xsi:type="string">1</item>
+                <item name="recaptcha_backend/type_magetu_turnstile/private_key" xsi:type="string">1</item>
+                <item name="recaptcha_frontend/type_magetu_turnstile/public_key" xsi:type="string">1</item>
+                <item name="recaptcha_frontend/type_magetu_turnstile/private_key" xsi:type="string">1</item>
+            </argument>
+            <argument name="environment" xsi:type="array">
+                <item name="recaptcha_backend/type_magetu_turnstile/public_key" xsi:type="string">1</item>
+                <item name="recaptcha_backend/type_magetu_turnstile/private_key" xsi:type="string">1</item>
+                <item name="recaptcha_frontend/type_magetu_turnstile/public_key" xsi:type="string">1</item>
+                <item name="recaptcha_frontend/type_magetu_turnstile/private_key" xsi:type="string">1</item>
+            </argument>
+        </arguments>
+    </type>
+    <virtualType name="Magento\ReCaptchaAdminUi\Model\OptionSource\Type">
+        <arguments>
+            <argument name="options" xsi:type="array">
+                <item name="magetu_turnstile" xsi:type="array">
+                    <item name="label" xsi:type="string" translate="true">Cloudflare Turnstile</item>
+                    <item name="value" xsi:type="string">magetu_turnstile</item>
+                </item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="Magetu\Turnstile\Model\OptionSource\Size"
+                 type="Magento\ReCaptchaAdminUi\Model\OptionSource">
+        <arguments>
+            <argument name="options" xsi:type="array">
+                <item name="normal" xsi:type="array">
+                    <item name="label" xsi:type="string" translate="true">Normal</item>
+                    <item name="value" xsi:type="string">normal</item>
+                </item>
+                <item name="flexible" xsi:type="array">
+                    <item name="label" xsi:type="string" translate="true">Flexible</item>
+                    <item name="value" xsi:type="string">flexible</item>
+                </item>
+                <item name="compact" xsi:type="array">
+                    <item name="label" xsi:type="string" translate="true">Compact</item>
+                    <item name="value" xsi:type="string">compact</item>
+                </item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="Magetu\Turnstile\Model\OptionSource\Theme"
+                 type="Magento\ReCaptchaAdminUi\Model\OptionSource">
+        <arguments>
+            <argument name="options" xsi:type="array">
+                <item name="auto" xsi:type="array">
+                    <item name="label" xsi:type="string" translate="true">Auto</item>
+                    <item name="value" xsi:type="string">auto</item>
+                </item>
+                <item name="light" xsi:type="array">
+                    <item name="label" xsi:type="string" translate="true">Light</item>
+                    <item name="value" xsi:type="string">light</item>
+                </item>
+                <item name="dark" xsi:type="array">
+                    <item name="label" xsi:type="string" translate="true">Dark</item>
+                    <item name="value" xsi:type="string">dark</item>
+                </item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="Magetu\Turnstile\Model\OptionSource\Appearance"
+                 type="Magento\ReCaptchaAdminUi\Model\OptionSource">
+        <arguments>
+            <argument name="options" xsi:type="array">
+                <item name="always" xsi:type="array">
+                    <item name="label" xsi:type="string" translate="true">Always</item>
+                    <item name="value" xsi:type="string">always</item>
+                </item>
+                <item name="execute" xsi:type="array">
+                    <item name="label" xsi:type="string" translate="true">Execute</item>
+                    <item name="value" xsi:type="string">execute</item>
+                </item>
+                <item name="interaction-only" xsi:type="array">
+                    <item name="label" xsi:type="string" translate="true">Interaction Only</item>
+                    <item name="value" xsi:type="string">interaction-only</item>
+                </item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <type name="Magento\ReCaptchaUi\Model\UiConfigResolver">
+        <arguments>
+            <argument name="uiConfigProviders" xsi:type="array">
+                <item name="admin_magetu_turnstile" xsi:type="object">Magetu\Turnstile\Model\Adminhtml\UiConfigProvider\Proxy</item>
+                <item name="frontend_magetu_turnstile" xsi:type="object">Magetu\Turnstile\Model\Frontend\UiConfigProvider\Proxy</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Magento\ReCaptchaUi\Model\ValidationConfigResolver">
+        <arguments>
+            <argument name="validationConfigProviders" xsi:type="array">
+                <item name="admin_magetu_turnstile" xsi:type="object">Magetu\Turnstile\Model\Adminhtml\ValidationConfigProvider\Proxy</item>
+                <item name="frontend_magetu_turnstile" xsi:type="object">Magetu\Turnstile\Model\Frontend\ValidationConfigProvider\Proxy</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <!--
+        Dispatch. sortOrder MUST stay above 0: Magento\ReCaptchaWebapiRest\Plugin\ValidationOverrider
+        is declared with no sortOrder (so 0) and a lower sortOrder wraps a higher one, so this plugin
+        sits INSIDE it and integration-token REST calls stay exempt exactly as they are today.
+    -->
+    <type name="Magento\ReCaptchaValidationApi\Api\ValidatorInterface">
+        <plugin name="magetu_turnstile_validate" type="Magetu\Turnstile\Plugin\ValidateTurnstile" sortOrder="100"/>
+    </type>
+    <type name="Magento\ReCaptchaUi\Model\ValidationConfigResolverInterface">
+        <plugin name="magetu_turnstile_inject_expected_action" type="Magetu\Turnstile\Plugin\InjectExpectedAction"/>
+    </type>
+    <!--
+        The other half of the same id. InjectExpectedAction names the action the token must report
+        back; this one names the action the widget mints it for. Both take the id from the key the
+        surface asked its resolver for, so neither can be changed without the other.
+    -->
+    <type name="Magento\ReCaptchaUi\Model\UiConfigResolverInterface">
+        <plugin name="magetu_turnstile_inject_widget_action" type="Magetu\Turnstile\Plugin\InjectWidgetAction"/>
+    </type>
+
+    <!--
+        Rendering. Every Luma-stack storefront surface and both admin pages insert the same block
+        class, so this one global declaration covers all of them; it only acts when the resolved type
+        is ours, so it cannot clobber another captcha type's template.
+    -->
+    <type name="Magento\ReCaptchaUi\Block\ReCaptcha">
+        <plugin name="magetu_turnstile_swap_widget_template" type="Magetu\Turnstile\Plugin\SwapWidgetTemplate"/>
+    </type>
+
+    <!--
+        Both providers below are SHARED by every captcha type on the store, so only `turnstile-`
+        prefixed codes are registered here. Cloudflare mirrors Google's siteverify error vocabulary
+        (invalid-input-response, timeout-or-duplicate, missing-input-response, bad-request, ...), so
+        registering those literals raw would reclassify GOOGLE reCAPTCHA failures, and drop their log
+        line, on every store with this module installed.
+
+        The technical codes VerifyToken synthesises (connection-failed, bad-response, invalid-json,
+        hostname-mismatch, action-mismatch, unknown-error) are deliberately absent: native already
+        labels and classifies each as technical, so registering them would be a no-op.
+
+        Cloudflare's own technical codes pass through unmapped and are not all labelled by native
+        (invalid-input-secret and bad-request are; internal-error isn't), an accepted trade, since
+        the raw code matches Cloudflare's docs and adding a label here would mean an unprefixed entry
+        in a shared provider, the exact thing this comment explains we avoid.
+
+        Derived from VerifyToken::USER_CAUSED_CODE_MAP and pinned by
+        Test/Unit/Model/Service/ErrorCodeRegistrationTest.
+    -->
+    <type name="Magento\ReCaptchaValidationApi\Model\ErrorMessagesProvider">
+        <arguments>
+            <argument name="errors" xsi:type="array">
+                <item name="turnstile-missing-input-response" xsi:type="string" translatable="true">The verification response is missing. Please try again.</item>
+                <item name="turnstile-invalid-input-response" xsi:type="string" translatable="true">The verification response is invalid. Please try again.</item>
+                <item name="turnstile-timeout-or-duplicate" xsi:type="string" translatable="true">The verification has expired. Please try again.</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Magento\ReCaptchaValidationApi\Model\ValidationErrorMessagesProvider">
+        <arguments>
+            <argument name="errors" xsi:type="array">
+                <item name="turnstile-missing-input-response" xsi:type="string" translatable="true">The verification response is missing. Please try again.</item>
+                <item name="turnstile-invalid-input-response" xsi:type="string" translatable="true">The verification response is invalid. Please try again.</item>
+                <item name="turnstile-timeout-or-duplicate" xsi:type="string" translatable="true">The verification has expired. Please try again.</item>
+            </argument>
+        </arguments>
+    </type>
+</config>

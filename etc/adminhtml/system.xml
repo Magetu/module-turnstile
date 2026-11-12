@@ -1,0 +1,136 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Magetu. All rights reserved.
+ * See LICENSE.md for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="recaptcha_backend">
+            <group id="type_magetu_turnstile" translate="label" type="text" sortOrder="40" showInDefault="1"
+                   showInWebsite="0" showInStore="0">
+                <label>Cloudflare Turnstile</label>
+
+                <field id="public_key" translate="label" type="obscure" sortOrder="10" showInDefault="1"
+                       showInWebsite="0" showInStore="0" canRestore="0">
+                    <label>Turnstile Site Key</label>
+                    <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+                </field>
+
+                <field id="private_key" translate="label" type="obscure" sortOrder="20" showInDefault="1"
+                       showInWebsite="0" showInStore="0" canRestore="0">
+                    <label>Turnstile Secret Key</label>
+                    <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+                </field>
+
+                <field id="size" translate="label" type="select" sortOrder="30" showInDefault="1"
+                       showInWebsite="0" showInStore="0" canRestore="1">
+                    <label>Size</label>
+                    <source_model>Magetu\Turnstile\Model\OptionSource\Size</source_model>
+                </field>
+
+                <field id="theme" translate="label" type="select" sortOrder="40" showInDefault="1"
+                       showInWebsite="0" showInStore="0" canRestore="1">
+                    <label>Theme</label>
+                    <source_model>Magetu\Turnstile\Model\OptionSource\Theme</source_model>
+                </field>
+
+                <field id="appearance" translate="label comment" type="select" sortOrder="50" showInDefault="1"
+                       showInWebsite="0" showInStore="0" canRestore="1">
+                    <label>Appearance</label>
+                    <source_model>Magetu\Turnstile\Model\OptionSource\Appearance</source_model>
+                    <comment><![CDATA[The widget mode (Managed, Non-Interactive, Invisible) is chosen when the widget is created in the Cloudflare dashboard, not here. This setting only styles what the chosen mode renders.]]></comment>
+                </field>
+
+                <field id="lang" translate="label comment" type="text" sortOrder="60" showInDefault="1"
+                       showInWebsite="0" showInStore="0" canRestore="1">
+                    <label>Language Code</label>
+                    <comment><![CDATA[Optional. Forces the widget to render in a specific language. Auto-detects the user's language if unspecified.]]></comment>
+                </field>
+
+                <field id="send_remote_ip" translate="label" type="select" sortOrder="70" showInDefault="1"
+                       showInWebsite="0" showInStore="0" canRestore="1">
+                    <label>Send Visitor IP to Cloudflare</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+
+                <field id="validate_action" translate="label comment" type="select" sortOrder="80" showInDefault="1"
+                       showInWebsite="0" showInStore="0" canRestore="1">
+                    <label>Validate Action</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment><![CDATA[Reject a token whose Turnstile action does not match the surface that requested it.]]></comment>
+                </field>
+
+                <field id="allowed_hostnames" translate="label comment" type="text" sortOrder="90" showInDefault="1"
+                       showInWebsite="0" showInStore="0" canRestore="1">
+                    <label>Allowed Hostnames</label>
+                    <comment><![CDATA[Optional, comma-separated. Overrides the hostnames a siteverify response is checked against. Leave empty to derive the hostname from the configured base URL.]]></comment>
+                </field>
+            </group>
+        </section>
+        <section id="recaptcha_frontend">
+            <group id="type_magetu_turnstile" translate="label" type="text" sortOrder="40" showInDefault="1"
+                   showInWebsite="1" showInStore="1">
+                <label>Cloudflare Turnstile</label>
+
+                <field id="public_key" translate="label" type="obscure" sortOrder="10" showInDefault="1"
+                       showInWebsite="1" showInStore="0" canRestore="0">
+                    <label>Turnstile Site Key</label>
+                    <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+                </field>
+
+                <field id="private_key" translate="label" type="obscure" sortOrder="20" showInDefault="1"
+                       showInWebsite="1" showInStore="0" canRestore="0">
+                    <label>Turnstile Secret Key</label>
+                    <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+                </field>
+
+                <field id="size" translate="label" type="select" sortOrder="30" showInDefault="1"
+                       showInWebsite="1" showInStore="0" canRestore="1">
+                    <label>Size</label>
+                    <source_model>Magetu\Turnstile\Model\OptionSource\Size</source_model>
+                </field>
+
+                <field id="theme" translate="label" type="select" sortOrder="40" showInDefault="1"
+                       showInWebsite="1" showInStore="1" canRestore="1">
+                    <label>Theme</label>
+                    <source_model>Magetu\Turnstile\Model\OptionSource\Theme</source_model>
+                </field>
+
+                <field id="appearance" translate="label comment" type="select" sortOrder="50" showInDefault="1"
+                       showInWebsite="1" showInStore="0" canRestore="1">
+                    <label>Appearance</label>
+                    <source_model>Magetu\Turnstile\Model\OptionSource\Appearance</source_model>
+                    <comment><![CDATA[The widget mode (Managed, Non-Interactive, Invisible) is chosen when the widget is created in the Cloudflare dashboard, not here. This setting only styles what the chosen mode renders.]]></comment>
+                </field>
+
+                <field id="lang" translate="label comment" type="text" sortOrder="60" showInDefault="1"
+                       showInWebsite="1" showInStore="1" canRestore="1">
+                    <label>Language Code</label>
+                    <comment><![CDATA[Optional. Forces the widget to render in a specific language. Auto-detects the user's language if unspecified.]]></comment>
+                </field>
+
+                <field id="send_remote_ip" translate="label" type="select" sortOrder="70" showInDefault="1"
+                       showInWebsite="1" showInStore="0" canRestore="1">
+                    <label>Send Visitor IP to Cloudflare</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+
+                <field id="validate_action" translate="label comment" type="select" sortOrder="80" showInDefault="1"
+                       showInWebsite="1" showInStore="0" canRestore="1">
+                    <label>Validate Action</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment><![CDATA[Reject a token whose Turnstile action does not match the surface that requested it.]]></comment>
+                </field>
+
+                <field id="allowed_hostnames" translate="label comment" type="text" sortOrder="90" showInDefault="1"
+                       showInWebsite="1" showInStore="0" canRestore="1">
+                    <label>Allowed Hostnames</label>
+                    <comment><![CDATA[Optional, comma-separated. Overrides the hostnames a siteverify response is checked against. Leave empty to derive the hostname from the configured base URL.]]></comment>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Magetu. All rights reserved.
+ * See LICENSE.md for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <recaptcha_backend>
+            <type_magetu_turnstile>
+                <public_key backend_model="Magento\Config\Model\Config\Backend\Encrypted"/>
+                <private_key backend_model="Magento\Config\Model\Config\Backend\Encrypted"/>
+                <size>flexible</size>
+                <theme>auto</theme>
+                <appearance>always</appearance>
+                <lang/>
+                <send_remote_ip>0</send_remote_ip>
+                <validate_action>1</validate_action>
+                <allowed_hostnames/>
+                <validation_failure_message>You failed the security check. Please try again.</validation_failure_message>
+            </type_magetu_turnstile>
+        </recaptcha_backend>
+        <recaptcha_frontend>
+            <type_magetu_turnstile>
+                <public_key backend_model="Magento\Config\Model\Config\Backend\Encrypted"/>
+                <private_key backend_model="Magento\Config\Model\Config\Backend\Encrypted"/>
+                <size>flexible</size>
+                <theme>auto</theme>
+                <appearance>always</appearance>
+                <lang/>
+                <send_remote_ip>0</send_remote_ip>
+                <validate_action>1</validate_action>
+                <allowed_hostnames/>
+                <validation_failure_message>You failed the security check. Please try again.</validation_failure_message>
+            </type_magetu_turnstile>
+            <!-- Visitors see these section-level messages, not the type-level one above; the core defaults name reCAPTCHA. -->
+            <failure_messages>
+                <validation_failure_message>Verification failed. Please try again.</validation_failure_message>
+                <technical_failure_message>Something went wrong with the security check. Please try again or contact us.</technical_failure_message>
+            </failure_messages>
+        </recaptcha_frontend>
+    </default>
+</config>

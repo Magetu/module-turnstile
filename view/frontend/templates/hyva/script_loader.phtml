@@ -1,0 +1,35 @@
+<?php
+/**
+ * Copyright © Magetu. All rights reserved.
+ * See LICENSE.md for license details.
+ */
+
+declare(strict_types=1);
+
+use Magento\Framework\View\Element\Template;
+use Magento\Framework\View\Helper\SecureHtmlRenderer;
+
+/** @var Template $block */
+/** @var SecureHtmlRenderer $secureRenderer */
+
+/**
+ * The single entry point for the widget script on a page, rendered at the end of the body.
+ *
+ * The script it loads owns the whole provider API: injecting api.js once, holding that back until
+ * the visitor touches the page or the browser goes idle, keeping the widget registry, and exposing
+ * the reset the submit-time fragment calls. Nothing here duplicates any of that: one page, one
+ * script, one registry.
+ *
+ * Deferred rather than blocking, which also fixes the order: a deferred script runs after the
+ * document is parsed and before DOMContentLoaded, the event the per-widget init waits for.
+ *
+ * No configuration gates whether this emits. The script defines a global and does nothing until a
+ * widget asks it to render, so an unguarded page pays for one small cacheable request, while a gate
+ * that got its condition wrong would leave a guarded form with no widget, rejecting every visitor.
+ */
+$scriptUrl = $block->getViewFileUrl('Magetu_Turnstile::js/turnstile-widget.js');
+?>
+<?= /* @noEscape */ $secureRenderer->renderTag(
+    'script',
+    ['type' => 'text/javascript', 'src' => $scriptUrl, 'defer' => 'defer']
+) ?>

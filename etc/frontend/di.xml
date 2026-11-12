@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Magetu. All rights reserved.
+ * See LICENSE.md for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="Magento\ReCaptchaUi\Model\UiConfigResolver">
+        <arguments>
+            <argument name="uiConfigProviders" xsi:type="array">
+                <item name="magetu_turnstile" xsi:type="object">Magetu\Turnstile\Model\Frontend\UiConfigProvider\Proxy</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Magento\ReCaptchaUi\Model\ValidationConfigResolver">
+        <arguments>
+            <argument name="validationConfigProviders" xsi:type="array">
+                <item name="magetu_turnstile" xsi:type="object">Magetu\Turnstile\Model\Frontend\ValidationConfigProvider\Proxy</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Magento\ReCaptchaUi\Model\RequestHandlerInterface">
+        <plugin name="magetu_turnstile_keep_form_input_on_reject"
+                type="Magetu\Turnstile\Plugin\KeepFormInputOnReject"/>
+    </type>
+    <type name="Magetu\Turnstile\Plugin\KeepFormInputOnReject">
+        <arguments>
+            <argument name="customerSession" xsi:type="object">Magento\Customer\Model\Session\Proxy</argument>
+        </arguments>
+    </type>
+</config>

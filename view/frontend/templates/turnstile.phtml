@@ -1,0 +1,38 @@
+<?php
+/**
+ * Copyright © Magetu. All rights reserved.
+ * See LICENSE.md for license details.
+ */
+
+declare(strict_types=1);
+
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Helper\SecureHtmlRenderer;
+use Magento\ReCaptchaUi\Block\ReCaptcha;
+use Magetu\Turnstile\Plugin\SwapWidgetTemplate;
+
+/** @var ReCaptcha $block */
+/** @var Escaper $escaper */
+/** @var SecureHtmlRenderer $secureRenderer */
+
+// Rendered in place of the native template by Magetu\Turnstile\Plugin\SwapWidgetTemplate, which also
+// staged the widget parameters below. The widget creates its own hidden token input inside the
+// enclosing form, so this template adds no input of its own.
+
+$containerId = $block->getRecaptchaId() . '-container';
+$scriptUrl = $block->getViewFileUrl('Magetu_Turnstile::js/turnstile-widget.js');
+$parameters = [];
+
+foreach ((array)$block->getData(SwapWidgetTemplate::WIDGET_OPTIONS_KEY) as $name => $value) {
+    $parameters[] = "'" . $escaper->escapeJs((string)$name) . "': '" . $escaper->escapeJs((string)$value) . "'";
+}
+
+// The script tag below is neither async nor deferred, so it runs before this init in document order
+// and window.MagetuTurnstile is always defined by the time the init executes.
+$initScript = 'window.MagetuTurnstile.render('
+    . "document.getElementById('" . $escaper->escapeJs($containerId) . "'), "
+    . '{' . implode(', ', $parameters) . '});';
+?>
+<div class="field-recaptcha magetu-turnstile" id="<?= $escaper->escapeHtmlAttr($containerId) ?>"></div>
+<?= /* @noEscape */ $secureRenderer->renderTag('script', ['type' => 'text/javascript', 'src' => $scriptUrl]) ?>
+<?= /* @noEscape */ $secureRenderer->renderTag('script', ['type' => 'text/javascript'], $initScript, false) ?>

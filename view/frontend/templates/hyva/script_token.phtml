@@ -1,0 +1,90 @@
+<?php
+/**
+ * Copyright © Magetu. All rights reserved.
+ * See LICENSE.md for license details.
+ */
+
+declare(strict_types=1);
+
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\Template;
+use Magetu\Turnstile\ViewModel\WidgetConfig;
+
+/** @var Template $block */
+/** @var Escaper $escaper */
+
+/**
+ * This template emits a JavaScript FRAGMENT, not a script element.
+ *
+ * A theme renders it inside the submit handler of the component that owns the guarded form, where
+ * `$form` is that form element and `this.errors` is the counter the handler tests before posting.
+ * Opening a <script> tag here would tear that handler in half; the enclosing script and its CSP
+ * registration are the theme's.
+ * Contract: the caller must read the token in the same task.
+ *
+ * The reset matters: a token is redeemed once and expires after five minutes, so a form left on the
+ * page after a rejected attempt would otherwise offer the same spent token again. Resetting in the
+ * next task lets the caller capture this token before the widget mints the next one.
+ */
+
+/** @var WidgetConfig $widgetConfig */
+$widgetConfig = $block->getData('widget_config');
+$fieldName = $escaper->escapeJs($widgetConfig->getTokenFieldName());
+$message = $escaper->escapeJs(__('Please complete the security check, then try again.'));
+
+/**
+ * A submit can arrive before the widget has a token: the footer newsletter widget only starts on first use of
+ * its form, so an autofill-and-click or a paste-and-Enter beats it, and so can a fast submit on any form whose
+ * widget is still loading. Then the fragment holds the submit, polls the token field for up to this long, and
+ * runs the component's submitForm() again once the token is there, the way Hyvä's own reCAPTCHA v3 fragment
+ * re-runs it after grecaptcha.execute(). A component without submitForm() is refused at once, as before.
+ * So submitForm() must work when called with no event, may run twice, and must not set a busy guard before
+ * this fragment that would make the second run return early.
+ *
+ * The hold's state lives on the form element, not on `this`: Alpine writes a new key to the outermost scope of a
+ * nested x-data, which sibling forms share. A submit while one is held only joins it, and a form that already
+ * released a submit is refused, not held, when it has no token, so a held re-run never adds a second post.
+ */
+$waitMs = 10000;
+?>
+    const magetuTurnstileToken = $form['<?= /* @noEscape */ $fieldName ?>'];
+    const magetuTurnstileRefuse = () => {
+        if (typeof this.setErrorMessages === 'function') {
+            this.setErrorMessages('<?= /* @noEscape */ $message ?>');
+        }
+        // Always into the role="alert" messages region as well: the forms' own inline errors are plain text,
+        // which a screen reader does not announce.
+        if (typeof window.dispatchMessages === 'function') {
+            window.dispatchMessages([{type: 'error', text: '<?= /* @noEscape */ $message ?>'}], 5000);
+        }
+    };
+
+    if ($form.magetuTurnstileWaiting) {
+        // The held submit posts once the token arrives, even when the token is already there for this one.
+        this.errors = 1;
+    } else if (magetuTurnstileToken && magetuTurnstileToken.value) {
+        this.errors = 0;
+        $form.magetuTurnstileReleased = true;
+        window.setTimeout(() => window.MagetuTurnstile && window.MagetuTurnstile.reset($form), 0);
+    } else if (typeof this.submitForm === 'function' && !$form.magetuTurnstileReleased) {
+        this.errors = 1;
+        $form.magetuTurnstileWaiting = true;
+        const magetuTurnstileDeadline = Date.now() + <?= (int)$waitMs ?>;
+        const magetuTurnstilePoll = () => {
+            const field = $form['<?= /* @noEscape */ $fieldName ?>'];
+
+            if (field && field.value) {
+                $form.magetuTurnstileWaiting = false;
+                this.submitForm();
+            } else if (Date.now() < magetuTurnstileDeadline) {
+                window.setTimeout(magetuTurnstilePoll, 100);
+            } else {
+                $form.magetuTurnstileWaiting = false;
+                magetuTurnstileRefuse();
+            }
+        };
+        window.setTimeout(magetuTurnstilePoll, 100);
+    } else {
+        this.errors = 1;
+        magetuTurnstileRefuse();
+    }

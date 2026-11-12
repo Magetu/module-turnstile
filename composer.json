@@ -1,0 +1,51 @@
+{
+    "name": "magetu/module-turnstile",
+    "description": "Registers Cloudflare Turnstile as a native captcha type for Magento Open Source and Adobe Commerce.",
+    "type": "magento2-module",
+    "license": "MIT",
+    "keywords": [
+        "magento",
+        "magento2",
+        "captcha",
+        "recaptcha",
+        "turnstile",
+        "cloudflare",
+        "spam-protection"
+    ],
+    "authors": [
+        {
+            "name": "Magetu",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": "~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0",
+        "magento/framework": "^103.0",
+        "magento/module-config": "*",
+        "magento/module-customer": "*",
+        "magento/module-store": "*",
+        "magento/module-re-captcha-ui": "^1.1",
+        "magento/module-re-captcha-admin-ui": "^1.1",
+        "magento/module-re-captcha-frontend-ui": "^1.1",
+        "magento/module-re-captcha-validation-api": "^1.1.3",
+        "magento/module-re-captcha-validation": "^1.1"
+    },
+    "suggest": {
+        "magento/module-re-captcha-webapi-ui": "Carries the token to the REST-guarded checkout steps (place order, coupon, gift card). Without it those steps are guarded by no captcha type at all. It is not required only because a store with no Knockout checkout never loads it."
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9.5 || ^10.5 || ^12.0"
+    },
+    "extra": {
+        "magento-versions-verified": "2.4.7-p10",
+        "magento-versions-supported": "2.4.7 - 2.4.9"
+    },
+    "autoload": {
+        "files": [
+            "registration.php"
+        ],
+        "psr-4": {
+            "Magetu\\Turnstile\\": ""
+        }
+    }
+}

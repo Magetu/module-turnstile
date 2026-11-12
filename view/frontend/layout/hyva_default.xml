@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Magetu. All rights reserved.
+ * See LICENSE.md for license details.
+ */
+-->
+<!--
+    Rendering path for themes that dispatch to captcha blocks BY NAME rather than through
+    Magento\ReCaptchaUi\Block\ReCaptcha. Such a theme looks up `recaptcha_input_field_<type>` and
+    `recaptcha_validation_<type>` for the type selected on a surface and renders whichever block it
+    finds, so the two names below are the whole extension point: get one wrong and the surface
+    renders no widget, posts no token, and is rejected server side; the log only says Magento could
+    not resolve the reCAPTCHA parameter.
+
+    The handle is the twin of `default` that such themes add to every page they render, which is what
+    keeps these declarations out of every other theme, where nothing looks the names up and the
+    rendering path is the block plugin in etc/di.xml instead.
+
+    The two blocks are declared straight under <body> on purpose. They are never output in page flow;
+    they are fetched by name and rendered into the middle of a form template.
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <block name="recaptcha_input_field_magetu_turnstile"
+               template="Magetu_Turnstile::hyva/input.phtml">
+            <arguments>
+                <argument name="widget_config" xsi:type="object">Magetu\Turnstile\ViewModel\WidgetConfig</argument>
+                <!-- Captcha ids whose widget renders on first use of its form, not on page view. The
+                     newsletter form is in the footer of every page. -->
+                <argument name="lazy_form_ids" xsi:type="array">
+                    <item name="newsletter" xsi:type="string">newsletter</item>
+                </argument>
+            </arguments>
+        </block>
+        <block name="recaptcha_validation_magetu_turnstile"
+               template="Magetu_Turnstile::hyva/script_token.phtml">
+            <arguments>
+                <argument name="widget_config" xsi:type="object">Magetu\Turnstile\ViewModel\WidgetConfig</argument>
+            </arguments>
+        </block>
+        <referenceContainer name="before.body.end">
+            <block name="magetu_turnstile_script_loader"
+                   template="Magetu_Turnstile::hyva/script_loader.phtml"/>
+        </referenceContainer>
+    </body>
+</page>

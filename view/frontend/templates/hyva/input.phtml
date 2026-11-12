@@ -1,0 +1,129 @@
+<?php
+/**
+ * Copyright © Magetu. All rights reserved.
+ * See LICENSE.md for license details.
+ */
+
+declare(strict_types=1);
+
+use Hyva\Theme\ViewModel\HyvaCsp;
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\Template;
+use Magetu\Turnstile\ViewModel\WidgetConfig;
+
+/** @var Template $block */
+/** @var Escaper $escaper */
+/** @var HyvaCsp $hyvaCsp */
+
+// Rendered inside the guarded form itself. The widget creates its own hidden token input in that
+// form, so this template adds no input of its own; the container below is all it needs.
+
+/** @var WidgetConfig $widgetConfig */
+$widgetConfig = $block->getData('widget_config');
+$containerId = $widgetConfig->getContainerId($block);
+$options = $widgetConfig->getWidgetOptions($block);
+$parameters = [];
+
+foreach ($options as $name => $value) {
+    $name = $escaper->escapeJs((string)$name);
+    $parameters[] = "'" . $name . "': '" . $escaper->escapeJs((string)$value) . "'";
+}
+
+// Forms listed in the layout's `lazy_form_ids` render their widget on first use, not on page view.
+$lazy = in_array((string)$block->getData('form_id'), (array)$block->getData('lazy_form_ids'), true);
+
+// Reserve the widget's whole box, so drawing it neither pushes the page down nor wraps a flex sibling (the footer
+// Subscribe button). Cloudflare's sizes: compact 150x140, normal 300x65, flexible 100% (min 300) x 65; min(..., 100%)
+// keeps the empty reserve inside a narrow parent. None for appearance "interaction-only", which shows the widget only
+// when a challenge needs the visitor (set it for an Invisible sitekey too, which never draws); "execute" shows it once
+// the challenge begins, at render here (no `execution` option).
+$minHeight = 0;
+$minWidth = 0;
+
+if (($options['appearance'] ?? 'always') !== 'interaction-only') {
+    $compact = ($options['size'] ?? '') === 'compact';
+    $minHeight = $compact ? 140 : 65;
+    $minWidth = $compact ? 150 : 300;
+}
+?>
+<?php
+/**
+ * `wire:ignore` marks this subtree off-limits to a DOM-morphing re-render, which matters on a
+ * Magewire-driven checkout: this container renders EMPTY and is filled in by JavaScript, so a morph
+ * comparing a populated live node against an empty server-rendered one reconciles the widget and its
+ * hidden token input away. Nothing puts them back: the init below runs once, and scripts a morph
+ * introduces do not execute, so the surface would reject every submit, and the log would only
+ * say Magento could not resolve the reCAPTCHA parameter.
+ *
+ * The bare directive is deliberate: `wire:ignore.self` still morphs children, which is exactly
+ * where the iframe and token input live. It's inert wherever Magewire is absent (unknown attributes
+ * are ignored, Alpine only reads its own prefix), so it adds no dependency.
+ *
+ * What it does NOT buy: token transport. A Magewire round-trip submits a component snapshot and its
+ * bound properties, never an unbound hidden input, so surviving a morph isn't the same as being
+ * submitted by one. Guarding a Magewire-driven form needs work beyond this attribute.
+ */
+?>
+<div class="field-recaptcha magetu-turnstile"
+     id="<?= $escaper->escapeHtmlAttr($containerId) ?>"
+     <?php if ($minHeight): ?>
+     style="min-height: <?= (int)$minHeight ?>px; min-width: min(<?= (int)$minWidth ?>px, 100%)"
+     <?php endif ?>
+     wire:ignore></div>
+<script>
+    'use strict';
+    (function () {
+        var options = {<?= /* @noEscape */ implode(', ', $parameters) ?>};
+        var selector = '#<?= $escaper->escapeJs($containerId) ?>';
+
+        var start = function () {
+            if (!window.MagetuTurnstile) {
+                window.console && window.console.warn(
+                    'Magetu_Turnstile: the widget script is absent, so this form will be rejected.'
+                );
+
+                return;
+            }
+            window.MagetuTurnstile.render(selector, options);
+        };
+
+        // A form on every page (the footer newsletter) would otherwise load the Turnstile API on
+        // every page view. It waits for the visitor to use the form instead: pointerdown as well as
+        // focus and input, because Safari does not focus a button on click and an autofilled field
+        // may never take focus. And submit, for a prefilled form submitted with none of those first;
+        // the validation fragment then holds that submit until the token arrives.
+        var startOnFirstUse = function () {
+            var container = document.querySelector(selector);
+            var form = container && container.closest('form');
+            var events = ['focusin', 'input', 'pointerdown', 'submit'];
+            var go;
+
+            if (!form) {
+                start();
+
+                return;
+            }
+            go = function () {
+                events.forEach(function (name) {
+                    form.removeEventListener(name, go, true);
+                });
+                start();
+            };
+            events.forEach(function (name) {
+                form.addEventListener(name, go, true);
+            });
+        };
+        var init = <?= $lazy ? 'startOnFirstUse' : 'start' ?>;
+
+        // The script that defines that global is emitted once at the end of the body, so this init
+        // waits for the parse to finish before looking for it. A form built by a JS component after
+        // that point takes the second branch, one tick later, once the component has finished
+        // writing its markup.
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            window.setTimeout(init);
+        }
+    })();
+</script>
+<?php $hyvaCsp->registerInlineScript() ?>
